@@ -9,6 +9,9 @@
 	svg multisprites
 	
 	html concat do not break on exeption
+	
+	svg defs
+	minify svg defs
 */
 
 'use strict';
@@ -42,7 +45,10 @@ var gulp		= require('gulp'),
 	pngquant	= require('imagemin-pngquant'),
 	imagemin	= require('gulp-imagemin'),
 	spritesmith	= require('gulp.spritesmith-multi'),
-	svgSprite	= require('gulp-svg-sprites'),
+	svgSprites	= require('gulp-svg-sprites'),			//has bugs with symbol mode
+	svgSprite	= require('gulp-svg-sprite'),
+	svgmin		= require('gulp-svgmin'),
+	rsp			= require('remove-svg-properties').stream,
 	filter		= require('gulp-filter'),
 	raster		= require('gulp-raster'),
 	rename		= require('gulp-rename');
@@ -77,7 +83,7 @@ var path = {
 		fonts: 'source/fonts/**/*.*'
 	},
 	watch: { //Тут мы укажем, за изменением каких файлов мы хотим наблюдать
-		html: 'source/**/*.html',
+		html: 'source/**/*.*',
 		js: 'source/js/**/*.js',
 		style: 'source/css/**/*.*ss',
 		img: 'source/img/common/**/*.*',
@@ -377,7 +383,7 @@ gulp.task('image:sprite', function () {
 // build svg sprites
 gulp.task('image:svgsprite', function () {
 	return gulp.src(path.src.sprite + '*.svg')
-		.pipe(svgSprite({
+		.pipe(svgSprites({
 			cssFile: path.src.spritestyle + 'sprite-svg.css',
 			svg: {
 				sprite: path.build.sprite + '/sprite.svg'
@@ -397,11 +403,43 @@ gulp.task('image:svgsprite', function () {
 		.pipe(connect.reload());
 });
 
+// build svg sprites (symbol mode)
+gulp.task('image:svgspritesymbol', function () {
+	return gulp.src(path.src.sprite + 'symbol/**/*.svg')
+	// minify svg
+		.pipe(svgmin({
+			js2svg: {
+				pretty: true
+			}
+		}))
+		// remove all fill, style and stroke declarations in out shapes
+		.pipe(rsp.remove({
+			properties: [rsp.PROPS_FILL, rsp.PROPS_STROKE, 'style']
+		}))
+		// build svg sprite
+		.pipe(svgSprite({
+			mode: {
+				symbol: {
+					sprite: "../sprite-sym.svg",
+					render: {
+						less: {
+							dest: '../../../../' + path.src.spritestyle+'sprite-sym.less',
+							template: "lib/sprite_symbol_template.less"
+						}
+					}
+				}
+			}
+		}))
+		.pipe(gulp.dest(path.build.sprite))
+		.pipe(connect.reload());
+});
+
 // start all image functions
 gulp.task('image', [
 	'image:build',
 	'image:sprite',
-	'image:svgsprite'
+	'image:svgsprite',
+	'image:svgspritesymbol'
 ]);
 
 // Run server
@@ -446,6 +484,12 @@ gulp.task('watch', function () {
 	watch([path.src.sprite + '*.svg'], function(event, cb) {
 		gulp.start('image:svgsprite');
 	});
+	
+	// svg sprite symbol mode
+	watch([path.src.sprite + 'symbol/**/*.svg'], function(event, cb) {
+		gulp.start('image:svgspritesymbol');
+		gulp.start('html:build');
+	});
 });
 
 
@@ -455,8 +499,8 @@ gulp.task('watch', function () {
 
 gulp.task('step1', ['clean', 'style:check']);
 gulp.task('step2', ['step21','step22']);
-gulp.task('step21', ['fonts:build', 'html:build', 'js:build']);
-gulp.task('step22', gulpsync.sync(['image', 'style:build']));
+gulp.task('step21', gulpsync.sync(['image', 'style:build', 'html:build']));
+gulp.task('step22', ['fonts:build', 'js:build']);
 
 // Default task
 gulp.task('default', gulpsync.sync(['step1','step2','runserver','watch']));
