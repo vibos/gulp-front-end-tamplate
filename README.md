@@ -19,6 +19,7 @@ Front-end template for Gulp
 5. Open http://localhost:9999/
 
 ## Folders structure
+```
 ├── bower.json                  # bower config
 ├── package.json                # npm confg
 ├── gulpfile.js                 # gulpfile
@@ -49,3 +50,4 @@ Front-end template for Gulp
 	└── js.js		# main JS file. Here merge all files
     ├── templates		# HTML templates
     └── index.html		# HTML index file
+```
