@@ -21,15 +21,15 @@ Front-end template for Gulp
 ## Folders structure
 ```
 ├── bower.json					# bower config
-├── package.json				# npm confg
+├── package.json					# npm confg
 ├── gulpfile.js					# gulpfile
 ├── lib							# gulp library files
-└── build						# Собранный проект
+└── build							# Собранный проект
 	├── css						# compiled CSS
 	├── img						# images
 		└── sprite				# sprites
 	├── js						# merged JS
-	├── minified				# compressed JS and CSS files
+	├── minified					# compressed JS and CSS files
 		├── css
 		└── js
 	└── index.html				# HTML index file
