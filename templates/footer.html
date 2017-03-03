@@ -1,0 +1,14 @@
+	<footer>footer</footer>
+
+		<script>
+			function b(){
+				var a=document.createElement("link");
+				a.rel="stylesheet";
+				a.href="/css/style.css?ver=0.0.0";
+				document.getElementsByTagName("head")[0].appendChild(a)
+			}
+			var c=requestAnimationFrame||mozRequestAnimationFrame||webkitRequestAnimationFrame||msRequestAnimationFrame;
+			c?c(b):window.addEventListener("load",b);
+		</script>
+	</body>
+</html>
