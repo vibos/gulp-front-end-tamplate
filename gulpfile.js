@@ -1,21 +1,4 @@
-/*
-	jslint
-	notify for jslint
-	
-	//бейбл
-	//полифиллер
-	
-	multisprites - одинаковые имена файлов
-	svg multisprites
-	
-	html concat do not break on exeption
-	
-	svg defs
-	minify svg defs
-*/
-
 'use strict';
-
 
 /* ******* */
 /* Plugins */
@@ -25,8 +8,7 @@ var gulp		= require('gulp'),
 	gulpsync	= require('gulp-sync')(gulp),
 	gutil		= require('gulp-util'),
 	watch		= require('gulp-watch'),
-	concat		= require('gulp-concat'),
-	plumber		= require('gulp-plumber'),
+	plumber		= require('gulp-plumber'),				// Prevent pipe breaking caused by errors from gulp plugins
 	notify		= require("gulp-notify"),
 	notifier	= require('node-notifier'),
 	buffer		= require('vinyl-buffer'),
@@ -45,7 +27,7 @@ var gulp		= require('gulp'),
 	pngquant	= require('imagemin-pngquant'),
 	imagemin	= require('gulp-imagemin'),
 	spritesmith	= require('gulp.spritesmith-multi'),
-	svgSprites	= require('gulp-svg-sprites'),			//has bugs with symbol mode
+	svgSprites	= require('gulp-svg-sprites'),			// has bugs with symbol mode
 	svgSprite	= require('gulp-svg-sprite'),
 	svgmin		= require('gulp-svgmin'),
 	rsp			= require('remove-svg-properties').stream,
@@ -55,10 +37,11 @@ var gulp		= require('gulp'),
 
 var beep = gutil.beep;
 
-
 /* ****** */
 /* Config */
 /* ****** */
+
+var version = "0.0";	// change it before release
 
 // Path
 var path = {
@@ -69,25 +52,28 @@ var path = {
 		minjs: 'build/minified/js/',
 		mincss: 'build/minified/css/',
 		img: 'build/img/',
-		sprite: 'build/img/sprite',
+		sprite: 'build/img/sprites/sprite.'+version,
+		spritesym: 'build/img/sprites',
 		fonts: 'build/fonts/'
 	},
 	src: { //Пути откуда брать исходники
 		html: 'source/*.html', //Синтаксис source/*.html говорит gulp что мы хотим взять все файлы с расширением .html
 		js: 'source/js/js.js',
-		style: 'source/css/style.less',
-		stylesToValidate: 'source/css/partials/**/*.less',
+		style: 'source/css/*.less',
+		stylesUrgent: 'source/css/urgent/*.less',
+		stylesToValidate: ['source/css/partials/**/*.less', 'source/css/urgent/**/*.less'],
 		spritestyle: 'source/css/generated/',
 		img: 'source/img/common/**/*.*', //Синтаксис img/**/*.* означает - взять все файлы всех расширений из папки и из вложенных каталогов
 		sprite: 'source/img/sprite/',
 		fonts: 'source/fonts/**/*.*'
 	},
 	watch: { //Тут мы укажем, за изменением каких файлов мы хотим наблюдать
-		html: 'source/**/*.*',
-		js: 'source/js/**/*.js',
-		style: 'source/css/**/*.*ss',
-		img: 'source/img/common/**/*.*',
-		fonts: 'source/fonts/**/*.*',
+		html:	['source/**/*.html'],
+		js:		['source/js/**/*.js'],
+		style:	['source/css/*.*ss', 'source/css/partials/*.*ss'],
+		styleUrgent:	['source/css/urgent/*.*ss'],
+		img:	['source/img/common/**/*.*'],
+		fonts:	['source/fonts/**/*.*'],
 	},
 	clean: {
 		build: './build',
@@ -107,7 +93,6 @@ var prefixerConfig = {
 	browsers: ['> 1%','last 6 versions'],
 	cascade: false
 }
-
 
 /* **************** */
 /* Errors reporters */
@@ -271,10 +256,13 @@ gulp.task('fonts:build', function() {
 
 // build HTML
 gulp.task('html:build', function () {
-	gulp.src(path.src.html)								// Выберем файлы по нужному пути
-		//.pipe(plumber({errorHandler : onHtmlError}))	// Перехватим ошибки
+	gulp.src(path.src.html)
+		.pipe(plumber({errorHandler : onHtmlError}))	// Перехватим ошибки
 		.pipe(include())								// Прогоним через file include
-		.pipe(htmlhint())								// Проверим валидность
+		.pipe(htmlhint({								// Проверим валидность
+			'attr-lowercase': false,
+			'spec-char-escape': false
+		}))
 		.pipe(htmlhint.reporter(htmlHintReporter))		// Show validation info
 		.pipe(gulp.dest(path.build.html))				// Выплюнем их в папку build
 		.pipe(connect.reload());						// И перезагрузим наш сервер для обновлений
@@ -302,7 +290,6 @@ gulp.task('style:check', function(){
 
 // build CSS
 gulp.task('style:build', function () {
-	// build
 	gulp.src(path.src.style)
 		.pipe(plumber({errorHandler : onStyleError}))
 		.pipe(include())
@@ -318,6 +305,24 @@ gulp.task('style:build', function () {
 		}))
 		.pipe(gulp.dest(path.build.mincss))	// выплюнем минифицырованный файл
 		.pipe(connect.reload());
+});
+
+// compile styles, that are built in html
+gulp.task('style:urgent', function () {
+	gulp.src(path.src.stylesUrgent)
+		.pipe(plumber({errorHandler : onStyleError}))
+		.pipe(include())
+		.pipe(sourcemaps.init())
+		.pipe(less())						// скомпилируем LESS
+		.pipe(prefixer(prefixerConfig))		// добавим вендорные префиксы
+		.pipe(sourcemaps.write())
+		.pipe(gulp.dest(path.build.css))	// выплюнем неминифицырованый файл
+		.pipe(cleanCSS({					// минифицируем
+			compatibility: 'ie8',
+			keepSpecialComments: 0,
+			roundingPrecision: 3
+		}))
+		.pipe(gulp.dest(path.src.spritestyle));	// выплюнем минифицырованный файл
 });
 
 // build JS
@@ -338,14 +343,14 @@ gulp.task('js:build', function () {
 
 // build images
 gulp.task('image:build', function () {
-	return gulp.src(path.src.img) //Выберем наши картинки
-		.pipe(imagemin({ // compress them
+	return gulp.src(path.src.img)			// Выберем наши картинки
+		.pipe(imagemin({					// compress them
 			progressive: true,
 			svgoPlugins: [{removeViewBox: false}],
 			use: [pngquant()],
 			interlaced: true
 		}))
-		.pipe(gulp.dest(path.build.img)) // And put into build
+		.pipe(gulp.dest(path.build.img))	// And put into build
 		.pipe(connect.reload());
 });
 
@@ -353,14 +358,14 @@ gulp.task('image:build', function () {
 // use inner folders for different sprites
 // All img names must vary
 gulp.task('image:sprite', function () {
-	var spriteData = gulp.src([path.src.sprite + '**/*.png', path.src.sprite + '**/*.gif', path.src.sprite + '**/*.jpg', path.src.sprite + '**/*.jpeg'])
+	var spriteData = gulp.src([path.src.sprite + '**/*.png', path.src.sprite + '**/*.gif', path.src.sprite + '**/*.jpg', path.src.sprite + '**/*.jpeg', path.src.sprite + '**/*.ico'])
 	.pipe(spritesmith({
 		spritesmith: function (options, sprite, icons) {
 			options.cssTemplate = '';
 			options.cssFormat = 'less';
 			options.cssName = sprite + '.less';
 			options.imgName = sprite + '.png';
-			options.imgPath = 'img/sprite/' + options.imgName;
+			options.imgPath = '../img/sprites/sprite.'+version+'/' + options.imgName;
 		}
 	}));
 	
@@ -384,15 +389,18 @@ gulp.task('image:sprite', function () {
 gulp.task('image:svgsprite', function () {
 	return gulp.src(path.src.sprite + '*.svg')
 		.pipe(svgSprites({
-			cssFile: path.src.spritestyle + 'sprite-svg.css',
+			cssFile: path.src.spritestyle + 'sprite-svg.less',
 			svg: {
 				sprite: path.build.sprite + '/sprite.svg'
 			},
 			preview: false,
-			svgPath: '../img/sprite/sprite.svg',
-			pngPath: '../img/sprite/sprite-svg.png',
+			svgPath: '../img/sprites/sprite.'+version+'/sprite.svg',
+			pngPath: '../img/sprites/sprite.'+version+'/sprite-svg.png',
 			padding: 1,
-			common: 'ico-svg'
+			common: 'ico-svg',
+			templates: {
+				css: require("fs").readFileSync("lib/sprite-svg.less", "utf-8")
+			}
 		}))
 		.pipe(gulp.dest(''))
 		// png fallback
@@ -430,7 +438,7 @@ gulp.task('image:svgspritesymbol', function () {
 				}
 			}
 		}))
-		.pipe(gulp.dest(path.build.sprite))
+		.pipe(gulp.dest(path.build.spritesym))
 		.pipe(connect.reload());
 });
 
@@ -447,36 +455,50 @@ gulp.task('runserver', function() {
 	connect.server(serverConfig);
 });
 
+gulp.task('reload', function() {
+	gulp.src(path.src.js)			// ad-hoc solution, no matter which src is
+		.pipe(connect.reload());
+	//gulp.start(connect.reload());
+});
+
 // Watch changes
 gulp.task('watch', function () {
 	// fonts
-	watch([path.watch.fonts], function(event, cb) {
+	watch(path.watch.fonts, function(event, cb) {
 		gulp.start('fonts:build');
 	});
 	
 	// html
-	watch([path.watch.html], function(event, cb) {
+	watch(path.watch.html, function(event, cb) {
 		gulp.start('html:build');
 	});
 	
 	// css
-	watch([path.watch.style], function(event, cb) {
+	watch(path.watch.style, function(event, cb) {
 		gulp.start('style:check');
 		gulp.start('style:build');
 	});
 	
+	// css urgent
+	watch(path.watch.styleUrgent, function(event, cb) {
+		gulp.start('style:check');
+		gulp.start('style:urgent');
+		gulp.start('html:build');
+	});
+	
 	// JS
-	watch([path.watch.js], function(event, cb) {
+	watch(path.watch.js, function(event, cb) {
 		gulp.start('js:build');
 	});
 	
 	// images
-	watch([path.watch.img], function(event, cb) {
+	watch(path.watch.img, function(event, cb) {
 		gulp.start('image:build');
+		gulp.start('style:build');
 	});
 	
 	// sprites
-	watch([path.src.sprite + '*.png', path.src.sprite + '*.gif', path.src.sprite + '*.jpg', path.src.sprite + '*.jpeg'], function(event, cb) {
+	watch([path.src.sprite + '**/*.png', path.src.sprite + '**/*.gif', path.src.sprite + '**/*.jpg', path.src.sprite + '**/*.jpeg'], function(event, cb) {
 		gulp.start('image:sprite');
 	});
 	
@@ -498,8 +520,8 @@ gulp.task('watch', function () {
 /* ********* */
 
 gulp.task('step1', ['clean', 'style:check']);
-gulp.task('step2', ['step21','step22']);
-gulp.task('step21', gulpsync.sync(['image', 'style:build', 'html:build']));
+gulp.task('step2', ['step21', 'step22']);
+gulp.task('step21', gulpsync.sync(['image', 'style:urgent', 'style:build', 'html:build']));
 gulp.task('step22', ['fonts:build', 'js:build']);
 
 // Default task
