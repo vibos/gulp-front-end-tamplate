@@ -14,11 +14,13 @@ Front-end template for Gulp
 1. Copy source, lib, bower.json, package.json, gulpfile.js.
 2. Run
 	$ npm install
-3. Run 
+3. Run
+	$ npm install node-notifier
+4. Run 
 	$ bower install
-4. Start server - run 
+5. Start server - run 
 	$ gulp
-5. Open http://localhost:9999/
+6. Open http://localhost:9999/
 
 ## Folders structure
 ```
@@ -45,7 +47,7 @@ Front-end template for Gulp
 	└── img						# images
 		├── common				# images to minify and put into build/img
 		└── sprite				# images to build sprite (png, gif, jpg, jpeg -> png sprites (one icluded foledr - one sprite)
-			|						# SVG files - svg sprite with png fallback (no included directories allowd)
+			|					# SVG files - svg sprite with png fallback (no included directories allowd)
 			└── symbol			# SVG sprite in symbol mode
 	├── js
 		├── lib					# JS libraries

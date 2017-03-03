@@ -1,0 +1,28 @@
+.ico-svg {
+    font-size: 10px;
+}
+
+.ico-svg:before {
+    content:' ';
+    vertical-align:middle;
+    display: inline-block;
+    background-image: url("../img/sprites/sprite.0.0/sprite.svg");
+    background-repeat: no-repeat;
+    background-size: 0em 0em;
+}
+
+.ico-svg-mixin() {
+    vertical-align:middle;
+    display: inline-block;
+    background-image: url("../img/sprites/sprite.0.0/sprite.svg");
+    background-repeat: no-repeat;
+    background-size: 0em 0em;
+}
+
+.no-svg .ico-svg:before {
+    background-image: url("../img/sprites/sprite.0.0/sprite-svg.png");
+}
+
+
+
+
