@@ -33,7 +33,8 @@ var gulp		= require('gulp'),
 	rsp			= require('remove-svg-properties').stream,
 	filter		= require('gulp-filter'),
 	raster		= require('gulp-raster'),
-	rename		= require('gulp-rename');
+	rename		= require('gulp-rename'),
+	open		= require('gulp-open');
 
 var beep = gutil.beep;
 
@@ -514,6 +515,12 @@ gulp.task('watch', function () {
 	});
 });
 
+// open browser
+gulp.task('browser', function(){
+	gulp.src('./index.html')
+		.pipe(open({uri: 'http://localhost:' + serverConfig.port}));
+});
+
 
 /* ********* */
 /* Start All */
@@ -525,4 +532,4 @@ gulp.task('step21', gulpsync.sync(['image', 'style:urgent', 'style:build', 'html
 gulp.task('step22', ['fonts:build', 'js:build']);
 
 // Default task
-gulp.task('default', gulpsync.sync(['step1','step2','runserver','watch']));
+gulp.task('default', gulpsync.sync(['step1', 'step2', 'runserver', 'watch', 'browser']));
