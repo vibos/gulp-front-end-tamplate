@@ -1,5 +1,6 @@
 # compiled output
 /build
+/source/css/generated
 
 # dependencies
 /node_modules
