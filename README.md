@@ -20,7 +20,7 @@ Front-end template for Gulp
 	$ bower install
 5. Start server - run 
 	$ gulp
-6. Open http://localhost:9999/
+6. http://localhost:9999/ will open automatically
 
 ## Folders structure
 ```

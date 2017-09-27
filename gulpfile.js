@@ -46,7 +46,7 @@ var version = "0.0";	// change it before release
 
 // Path
 var path = {
-	build: { //Тут мы укажем куда складывать готовые после сборки файлы
+	build: { //РўСѓС‚ РјС‹ СѓРєР°Р¶РµРј РєСѓРґР° СЃРєР»Р°РґС‹РІР°С‚СЊ РіРѕС‚РѕРІС‹Рµ РїРѕСЃР»Рµ СЃР±РѕСЂРєРё С„Р°Р№Р»С‹
 		html: 'build/',
 		js: 'build/js/',
 		css: 'build/css/',
@@ -57,18 +57,18 @@ var path = {
 		spritesym: 'build/img/sprites',
 		fonts: 'build/fonts/'
 	},
-	src: { //Пути откуда брать исходники
-		html: 'source/*.html', //Синтаксис source/*.html говорит gulp что мы хотим взять все файлы с расширением .html
+	src: { //РџСѓС‚Рё РѕС‚РєСѓРґР° Р±СЂР°С‚СЊ РёСЃС…РѕРґРЅРёРєРё
+		html: 'source/*.html', //РЎРёРЅС‚Р°РєСЃРёСЃ source/*.html РіРѕРІРѕСЂРёС‚ gulp С‡С‚Рѕ РјС‹ С…РѕС‚РёРј РІР·СЏС‚СЊ РІСЃРµ С„Р°Р№Р»С‹ СЃ СЂР°СЃС€РёСЂРµРЅРёРµРј .html
 		js: 'source/js/js.js',
 		style: 'source/css/*.less',
 		stylesUrgent: 'source/css/urgent/*.less',
 		stylesToValidate: ['source/css/partials/**/*.less', 'source/css/urgent/**/*.less'],
 		spritestyle: 'source/css/generated/',
-		img: 'source/img/common/**/*.*', //Синтаксис img/**/*.* означает - взять все файлы всех расширений из папки и из вложенных каталогов
+		img: 'source/img/common/**/*.*', //РЎРёРЅС‚Р°РєСЃРёСЃ img/**/*.* РѕР·РЅР°С‡Р°РµС‚ - РІР·СЏС‚СЊ РІСЃРµ С„Р°Р№Р»С‹ РІСЃРµС… СЂР°СЃС€РёСЂРµРЅРёР№ РёР· РїР°РїРєРё Рё РёР· РІР»РѕР¶РµРЅРЅС‹С… РєР°С‚Р°Р»РѕРіРѕРІ
 		sprite: 'source/img/sprite/',
 		fonts: 'source/fonts/**/*.*'
 	},
-	watch: { //Тут мы укажем, за изменением каких файлов мы хотим наблюдать
+	watch: { //РўСѓС‚ РјС‹ СѓРєР°Р¶РµРј, Р·Р° РёР·РјРµРЅРµРЅРёРµРј РєР°РєРёС… С„Р°Р№Р»РѕРІ РјС‹ С…РѕС‚РёРј РЅР°Р±Р»СЋРґР°С‚СЊ
 		html:	['source/**/*.html'],
 		js:		['source/js/**/*.js'],
 		style:	['source/css/*.*ss', 'source/css/partials/*.*ss'],
@@ -258,28 +258,28 @@ gulp.task('fonts:build', function() {
 // build HTML
 gulp.task('html:build', function () {
 	gulp.src(path.src.html)
-		.pipe(plumber({errorHandler : onHtmlError}))	// Перехватим ошибки
-		.pipe(include())								// Прогоним через file include
-		.pipe(htmlhint({								// Проверим валидность
+		.pipe(plumber({errorHandler : onHtmlError}))	// РџРµСЂРµС…РІР°С‚РёРј РѕС€РёР±РєРё
+		.pipe(include())								// РџСЂРѕРіРѕРЅРёРј С‡РµСЂРµР· file include
+		.pipe(htmlhint({								// РџСЂРѕРІРµСЂРёРј РІР°Р»РёРґРЅРѕСЃС‚СЊ
 			'attr-lowercase': false,
 			'spec-char-escape': false
 		}))
 		.pipe(htmlhint.reporter(htmlHintReporter))		// Show validation info
-		.pipe(gulp.dest(path.build.html))				// Выплюнем их в папку build
-		.pipe(connect.reload());						// И перезагрузим наш сервер для обновлений
+		.pipe(gulp.dest(path.build.html))				// Р’С‹РїР»СЋРЅРµРј РёС… РІ РїР°РїРєСѓ build
+		.pipe(connect.reload());						// Р РїРµСЂРµР·Р°РіСЂСѓР·РёРј РЅР°С€ СЃРµСЂРІРµСЂ РґР»СЏ РѕР±РЅРѕРІР»РµРЅРёР№
 });
 
 // check styles
 gulp.task('style:check', function(){
 	gulp.src(path.src.stylesToValidate)
-		.pipe(lesshint({					// проведем валидацию less
+		.pipe(lesshint({					// РїСЂРѕРІРµРґРµРј РІР°Р»РёРґР°С†РёСЋ less
 			"propertyOrdering": {
 				"enabled": false
 			}
 		}))
 		.pipe(lesshint.reporter("lib/lesshint.reporter.js"))
-		.pipe(less())						// скомпилируем LESS
-		.pipe(csslint({						// проведем валидацию CSS
+		.pipe(less())						// СЃРєРѕРјРїРёР»РёСЂСѓРµРј LESS
+		.pipe(csslint({						// РїСЂРѕРІРµРґРµРј РІР°Р»РёРґР°С†РёСЋ CSS
 			'adjoining-classes': false,
 			'order-alphabetical': false,
 			'unqualified-attributes': false,
@@ -295,16 +295,16 @@ gulp.task('style:build', function () {
 		.pipe(plumber({errorHandler : onStyleError}))
 		.pipe(include())
 		.pipe(sourcemaps.init())
-		.pipe(less())						// скомпилируем LESS
-		.pipe(prefixer(prefixerConfig))		// добавим вендорные префиксы
+		.pipe(less())						// СЃРєРѕРјРїРёР»РёСЂСѓРµРј LESS
+		.pipe(prefixer(prefixerConfig))		// РґРѕР±Р°РІРёРј РІРµРЅРґРѕСЂРЅС‹Рµ РїСЂРµС„РёРєСЃС‹
 		.pipe(sourcemaps.write())
-		.pipe(gulp.dest(path.build.css))	// выплюнем неминифицырованый файл
-		.pipe(cleanCSS({					// минифицируем
+		.pipe(gulp.dest(path.build.css))	// РІС‹РїР»СЋРЅРµРј РЅРµРјРёРЅРёС„РёС†С‹СЂРѕРІР°РЅС‹Р№ С„Р°Р№Р»
+		.pipe(cleanCSS({					// РјРёРЅРёС„РёС†РёСЂСѓРµРј
 			compatibility: 'ie8',
 			keepSpecialComments: 0,
 			roundingPrecision: 3
 		}))
-		.pipe(gulp.dest(path.build.mincss))	// выплюнем минифицырованный файл
+		.pipe(gulp.dest(path.build.mincss))	// РІС‹РїР»СЋРЅРµРј РјРёРЅРёС„РёС†С‹СЂРѕРІР°РЅРЅС‹Р№ С„Р°Р№Р»
 		.pipe(connect.reload());
 });
 
@@ -314,16 +314,16 @@ gulp.task('style:urgent', function () {
 		.pipe(plumber({errorHandler : onStyleError}))
 		.pipe(include())
 		.pipe(sourcemaps.init())
-		.pipe(less())						// скомпилируем LESS
-		.pipe(prefixer(prefixerConfig))		// добавим вендорные префиксы
+		.pipe(less())						// СЃРєРѕРјРїРёР»РёСЂСѓРµРј LESS
+		.pipe(prefixer(prefixerConfig))		// РґРѕР±Р°РІРёРј РІРµРЅРґРѕСЂРЅС‹Рµ РїСЂРµС„РёРєСЃС‹
 		.pipe(sourcemaps.write())
-		.pipe(gulp.dest(path.build.css))	// выплюнем неминифицырованый файл
-		.pipe(cleanCSS({					// минифицируем
+		.pipe(gulp.dest(path.build.css))	// РІС‹РїР»СЋРЅРµРј РЅРµРјРёРЅРёС„РёС†С‹СЂРѕРІР°РЅС‹Р№ С„Р°Р№Р»
+		.pipe(cleanCSS({					// РјРёРЅРёС„РёС†РёСЂСѓРµРј
 			compatibility: 'ie8',
 			keepSpecialComments: 0,
 			roundingPrecision: 3
 		}))
-		.pipe(gulp.dest(path.src.spritestyle));	// выплюнем минифицырованный файл
+		.pipe(gulp.dest(path.src.spritestyle));	// РІС‹РїР»СЋРЅРµРј РјРёРЅРёС„РёС†С‹СЂРѕРІР°РЅРЅС‹Р№ С„Р°Р№Р»
 });
 
 // build JS
@@ -333,18 +333,15 @@ gulp.task('js:build', function () {
 		.pipe(include())
 		.pipe(sourcemaps.write())
 		.pipe(sourcemaps.init())
-		.pipe(gulp.dest(path.build.js))		// выплюнем неминифицырованый файл
-		.pipe(uglify())						// Сожмем JS
-		.pipe(gulp.dest(path.build.minjs))	// выплюнем минифицырованный файл
+		.pipe(gulp.dest(path.build.js))		// РІС‹РїР»СЋРЅРµРј РЅРµРјРёРЅРёС„РёС†С‹СЂРѕРІР°РЅС‹Р№ С„Р°Р№Р»
+		.pipe(uglify())						// РЎРѕР¶РјРµРј JS
+		.pipe(gulp.dest(path.build.minjs))	// РІС‹РїР»СЋРЅРµРј РјРёРЅРёС„РёС†С‹СЂРѕРІР°РЅРЅС‹Р№ С„Р°Р№Р»
 		.pipe(connect.reload());
-		
-	//бейбл
-	//полифиллер
 });
 
 // build images
 gulp.task('image:build', function () {
-	return gulp.src(path.src.img)			// Выберем наши картинки
+	return gulp.src(path.src.img)			// Р’С‹Р±РµСЂРµРј РЅР°С€Рё РєР°СЂС‚РёРЅРєРё
 		.pipe(imagemin({					// compress them
 			progressive: true,
 			svgoPlugins: [{removeViewBox: false}],
@@ -459,7 +456,6 @@ gulp.task('runserver', function() {
 gulp.task('reload', function() {
 	gulp.src(path.src.js)			// ad-hoc solution, no matter which src is
 		.pipe(connect.reload());
-	//gulp.start(connect.reload());
 });
 
 // Watch changes
@@ -525,11 +521,26 @@ gulp.task('browser', function(){
 /* ********* */
 /* Start All */
 /* ********* */
-
-gulp.task('step1', ['clean', 'style:check']);
-gulp.task('step2', ['step21', 'step22']);
-gulp.task('step21', gulpsync.sync(['image', 'style:urgent', 'style:build', 'html:build']));
-gulp.task('step22', ['fonts:build', 'js:build']);
-
-// Default task
-gulp.task('default', gulpsync.sync(['step1', 'step2', 'runserver', 'watch', 'browser']));
+gulp.task('default', gulpsync.sync([
+	// sync
+	'clean',
+	[
+		// async
+		'style:check',
+		[
+			// sync
+			[
+				// async
+				'image',
+				'style:urgent',
+				'style:build'
+			],
+			'html:build'
+		],
+		'fonts:build',
+		'js:build'
+	],
+	'runserver',
+	'watch',
+	'browser'
+]));
