@@ -16,11 +16,16 @@ Front-end template for Gulp
 	$ npm install
 3. Run
 	$ npm install node-notifier
-4. Run 
+4. Run
 	$ bower install
 5. Start server - run 
 	$ gulp
 6. http://localhost:9999/ will open automatically
+
+## Using Sprites
+Enable them in source/css/style.less
+SVG: add class .ico-svg and .svg-file-name, where svg-file-name - name of your svg picture without extension.
+IMG: add display: inline-block to your element; add .sprite(@file-name) mixin to your element, where file-name is the name of your picture without extension.
 
 ## Folders structure
 ```
