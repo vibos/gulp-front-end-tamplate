@@ -11,16 +11,12 @@ Front-end template for Gulp
 - manually controll of sprite versions to prevent cache
 
 ## Getting Started
-1. Copy source, lib, bower.json, package.json, gulpfile.js.
-2. Run
-	$ npm install
-3. Run
-	$ npm install node-notifier
-4. Run
-	$ bower install
-5. Start server - run 
-	$ gulp
-6. http://localhost:9999/ will open automatically
+1. Copy source, lib, package.json, gulpfile.js.
+1. Install node modules:
+	`$ npm install`
+1. Start server:
+	`$ npm run start`
+1. http://localhost:9999/ will open automatically
 
 ## Using Sprites
 Enable them in source/css/style.less

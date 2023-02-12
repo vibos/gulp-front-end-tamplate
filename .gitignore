@@ -4,8 +4,10 @@
 
 # dependencies
 /node_modules
-/bower_components
 
 # System Files
 .DS_Store
 Thumbs.db
+
+package-lock.json
+.idea
